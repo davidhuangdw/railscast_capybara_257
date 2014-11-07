@@ -4,6 +4,8 @@
     New Task
   %h1 Listing tasks
 
+= link_to "test js", '#', onclick:'$(this).html("js works")'
+
 = form_for Task.new do |f|
   = f.label :name, "New Task:"
   = f.text_field :name

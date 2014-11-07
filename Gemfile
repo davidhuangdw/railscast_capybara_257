@@ -33,6 +33,9 @@ gem 'bootstrap-sass'
 group :development, :test do
   gem 'capybara'
   gem 'rspec-rails'
+  gem "spring-commands-rspec"
+  gem 'selenium-webdriver'
+  gem 'database_cleaner'
 end
 
 # Use ActiveModel has_secure_password
