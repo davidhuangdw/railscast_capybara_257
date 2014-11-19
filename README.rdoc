@@ -1,28 +1,84 @@
-== README
+        # bug & solution:
+        # 1. don't put 'better_errors' in 'test' group
+        group :development do
+          gem 'better_errors'
+          gem 'binding_of_caller'
+        end
+        # 2. 'let' scope: 'let' is same under the same 'describe'
+            describe 'under one describe, "let" is always the same last one' do
+              let(:value) {1}
+              it "is not 1" do
+                expect(value).not_to eq 1
+              end
+              let(:value) {2}
+              it "is 2" do
+                expect(value).to eq 2
+              end
+            end
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+        # generators
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+        # enable focus
+        config.treat_symbols_as_metadata_keys_with_true_values = true
+        config.filter_run focus:true
+        config.run_all_when_everything_filtered = true # run everything if nothing is focused
+        # specs
+        it "....", :focus {...}
+
+
+        # allow database for 'selenium-webdriver'
+        # problem: database transactions don't work in 'selenium'
+        # sol:
+        gem 'database_cleaner'
+        # change spec/rails_helper.rb
+        RSpec.configure do |config|
+          config.use_transactional_fixtures = false #true
+          config.before(:suite) do
+            DatabaseCleaner.strategy = :truncation      # can't use :transcation
+            DatabaseCleaner.clean_with(:truncation)
+          end
+
+          config.around(:each) do |example|
+            DatabaseCleaner.cleaning do
+              example.run
+            end
+          end
+        end
+
+
+        # support js in capybara
+          gem 'selenium-webdriver'
+
+        # add 'js:true' to 'describe' or 'it'
+        describe "GET /tasks", js:true {...}
+
+
+        # save_and_open_page
+        visit ...
+        ...
+        save_and_open_page
+        ...
+
+        # create test
+        rails g integration_test rspec
+
+        # capybar use 'visit' & 'page'
+        describe 'Tasks', type:request do
+          describe 'POST /tasks' do
+            it 'create task' do
+              visit tasks_path
+              fill_in "New Task", with: name
+              click_button "Add"
+              expect(page).to have_content(name)
+            end
+          end
+        end
+
+        group :development, :test do
+          gem 'rspec-rails'
+          gem 'capybara'
+        end
+        rails g rspec:install
+        rspec
+
